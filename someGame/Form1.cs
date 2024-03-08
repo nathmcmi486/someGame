@@ -12,6 +12,7 @@ namespace someGame
         {
             Form f = currentScreen.FindForm();
             f.Controls.Remove(currentScreen);
+            f.ActiveControl = null;
 
             newScreen.Location = new Point((f.ClientSize.Width - newScreen.Width) / 2, (f.ClientSize.Height - newScreen.Height) / 2);
             newScreen.Focus();

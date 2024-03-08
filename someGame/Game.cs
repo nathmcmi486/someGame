@@ -13,6 +13,7 @@ namespace someGame
     public partial class Game : UserControl
     {
         Random random = new Random();
+        bool running = false;
         bool wDown = false;
         bool aDown = false;
         bool dDown = false;
@@ -38,6 +39,7 @@ namespace someGame
 
         public Game(int _partn)
         {
+            Thread.Sleep(3500);
             InitializeComponent();
             part = _partn;
             gameParts[part].setupPart(player);
@@ -68,7 +70,7 @@ namespace someGame
             Refresh();
         }
 
-        private void keyDownHandler(object sender, KeyEventArgs e)
+        public void keyDownHandler(object sender, KeyEventArgs e)
         {
             this.debugLabel.Text = "keydown working!";
             switch (e.KeyCode)
@@ -93,8 +95,9 @@ namespace someGame
             }
         }
 
-        void keyUpHandler(object sender, KeyEventArgs e)
+        public void keyUpHandler(object sender, KeyEventArgs e)
         {
+            this.debugLabel.Text = "keyup working!";
             switch (e.KeyCode)
             {
                 case Keys.Escape:
