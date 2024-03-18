@@ -47,16 +47,25 @@
             this.exitButton.Text = "Exit";
             this.exitButton.Click += new System.EventHandler(this.exitButtonClick);
 
+            this.instructionsLabel = new System.Windows.Forms.Label();
+            this.instructionsLabel.Location = new System.Drawing.Point((this.Width / 2) + 150, 200);
+            this.instructionsLabel.Name = "exitButton";
+            this.instructionsLabel.Size = new System.Drawing.Size(220, 120);
+            this.instructionsLabel.TabIndex = 0;
+            this.instructionsLabel.Text = "Controls:\nW - To jump\nA - To move left\nD - To move right\nSpace - To shoot\nKey input sometimes doesn't work\nTry pressing keys while pressing \"Start\"";
+
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = Color.Gray;
 
             this.Controls.Add(this.startButton);
             this.Controls.Add(this.exitButton);
+            this.Controls.Add(this.instructionsLabel);
         }
 
         #endregion
 
         System.Windows.Forms.Button startButton;
         System.Windows.Forms.Button exitButton;
+        System.Windows.Forms.Label instructionsLabel;
     }
 }

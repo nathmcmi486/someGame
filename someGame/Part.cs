@@ -12,6 +12,7 @@ namespace someGame
         public Person[] enemies;
         public Person player;
         public bool setup;
+        public List<Bullet> bullets = new List<Bullet>();
 
         public Part(int _partNumber, Person[] _enemies)
         {

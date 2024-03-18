@@ -20,6 +20,7 @@ namespace someGame
         public readonly int WIDTH = 20;
         public readonly int HEIGHT = 50;
         public readonly int GROUND = 400;
+        public bool facingRight;
 
         // Only for the enemy
         const int RIGHT = 0;
@@ -27,6 +28,8 @@ namespace someGame
         const int JUMP = 2;
         const int SHOOT = 3;
         public List<int> enemyMoves = new List<int>();
+        public bool newBullet;
+        public Bullet bullet;
 
         public Person(bool _player, int _health, int _damage, int _xPos, int _yPos, int _speed, Color _color)
         {
@@ -42,6 +45,7 @@ namespace someGame
 
         public void left()
         {
+            facingRight = false;
             if (yPos < GROUND)
             {
                 yPos += speed / 2;
@@ -51,6 +55,7 @@ namespace someGame
 
         public void right()
         {
+            facingRight = true;
             if (yPos < GROUND)
             {
                 yPos += speed / 2;
@@ -99,7 +104,9 @@ namespace someGame
                     (lastMove + secondLastMove + thirdLastMove) / 3,
                     RIGHT,
                     LEFT,
+                    lastMove,
                     SHOOT,
+                    lastMove,
                 };
 
                 enemyMoves.Add(possibleMoves[rand.Next(0, possibleMoves.Count())]);
@@ -110,9 +117,11 @@ namespace someGame
             switch (newMove)
             {
                 case RIGHT:
+                    facingRight = true;
                     xPos -= speed;
                     break;
                 case LEFT:
+                    facingRight = false;
                     xPos += speed;
                     break;
                 case JUMP:
@@ -122,7 +131,8 @@ namespace someGame
                     }
                     break;
                 case SHOOT:
-                    // TODO
+                    newBullet = true;
+                    bullet = new Bullet(damage, false, Color.DarkBlue, facingRight, xPos, yPos);
                     break;
                 default:
                     break;

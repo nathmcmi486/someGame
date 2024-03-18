@@ -48,10 +48,10 @@
             this.healthLabel.Text = "";
 
             this.debugLabel = new System.Windows.Forms.Label();
-            this.debugLabel.Location = new System.Drawing.Point(this.Width / 2, this.Height / 2);
+            this.debugLabel.Location = new System.Drawing.Point(this.Width, 100);
             this.debugLabel.ForeColor = Color.White;
             this.debugLabel.Name = "debugLabel";
-            this.debugLabel.Size = new System.Drawing.Size(100, 20);
+            this.debugLabel.Size = new System.Drawing.Size(200, 100);
             this.debugLabel.Text = "";
 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;

@@ -17,8 +17,8 @@ namespace someGame
         bool wDown = false;
         bool aDown = false;
         bool dDown = false;
-        bool spaceDown;
-        bool hDown;
+        bool spaceDown = false;
+        bool hDown = false;
 
         int randn(int min, int max)
         {
@@ -62,9 +62,33 @@ namespace someGame
                 gameParts[part].player.right();
             }
 
+            // this.debugLabel.Text = gameParts[part].bullets.Count() + "";
+
+            for (int i = 0; i < gameParts[part].bullets.Count(); i++)
+            {
+                gameParts[part].bullets[i].move();
+
+                if (gameParts[part].bullets[i].xPos < 0 || gameParts[part].bullets[i].xPos > 800)
+                {
+                    gameParts[part].bullets.RemoveAt(i);
+                    continue;
+                }
+
+                if (gameParts[part].bullets[i].yPos < 0 || gameParts[part].bullets[i].yPos > 410)
+                {
+                    gameParts[part].bullets.RemoveAt(i);
+                    continue;
+                }
+            }
+
             for (int i = 0; i < gameParts[part].enemies.Count(); i++)
             {
                 gameParts[part].enemies[i].moveEnemy();
+                if (gameParts[part].enemies[i].newBullet)
+                {
+                    gameParts[part].bullets.Add(gameParts[part].enemies[i].bullet);
+                    gameParts[part].enemies[i].newBullet = false;
+                }
             }
 
             Refresh();
@@ -73,6 +97,7 @@ namespace someGame
         public void keyDownHandler(object sender, KeyEventArgs e)
         {
             this.debugLabel.Text = "keydown working!";
+            running = true;
             switch (e.KeyCode)
             {
                 case Keys.Escape:
@@ -90,6 +115,9 @@ namespace someGame
                 case Keys.H:
                     hDown = true;
                     break;
+                case Keys.Space:
+                    spaceDown = true;
+                    break;
                 default:
                     break;
             }
@@ -98,6 +126,7 @@ namespace someGame
         public void keyUpHandler(object sender, KeyEventArgs e)
         {
             this.debugLabel.Text = "keyup working!";
+            running = true;
             switch (e.KeyCode)
             {
                 case Keys.Escape:
@@ -115,6 +144,9 @@ namespace someGame
                 case Keys.H:
                     hDown = false;
                     break;
+                case Keys.Space:
+                    spaceDown = false;
+                    break;
                 default:
                     break;
             }
@@ -123,6 +155,14 @@ namespace someGame
         void paintHandler(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
+
+            // Using foreach stops key input
+            for (int i = 0; i < gameParts[part].bullets.Count(); i++)
+            {
+                // this.debugLabel.Text = $"drawing bullet {i}";
+                Rectangle rect = new Rectangle(gameParts[part].bullets[i].xPos, gameParts[part].bullets[i].yPos, gameParts[part].bullets[i].SIZE, gameParts[part].bullets[i].SIZE);
+                g.FillRectangle(new SolidBrush(gameParts[part].bullets[i].color), rect);
+            }
 
             foreach (Person enemy in gameParts[part].enemies)
             {
@@ -133,6 +173,7 @@ namespace someGame
             Person currentPlayer = gameParts[part].player;
             Rectangle playerRect = new Rectangle(currentPlayer.xPos, currentPlayer.yPos, currentPlayer.WIDTH, currentPlayer.HEIGHT);
             g.FillRectangle(currentPlayer.brush, playerRect);
+
         }
     }
 }
