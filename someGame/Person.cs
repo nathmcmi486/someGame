@@ -6,6 +6,15 @@ using System.Threading.Tasks;
 
 namespace someGame
 {
+    // Find better name
+    public enum PersonType
+    {
+        Player,
+        Helper,
+        RegularEnemy,
+        SpecialEnemy,
+    }
+
     // Find beter name
     internal class Person
     {
@@ -17,10 +26,14 @@ namespace someGame
         public Color color;
         public SolidBrush brush;
         bool player;
-        public readonly int WIDTH = 20;
-        public readonly int HEIGHT = 50;
+        public /*readonly*/ int WIDTH = 20;
+        public /*readonly*/ int HEIGHT = 50;
         public readonly int GROUND = 400;
         public bool facingRight;
+
+        // Only for the player
+        public int healCount = 0;
+        public int bullets = 50;
 
         // Only for the enemy
         const int RIGHT = 0;
@@ -41,6 +54,22 @@ namespace someGame
             color = _color;
             brush = new SolidBrush(color);
             player = _player;
+
+            // For sepcial enemies
+            if (health > 150)
+            {
+                WIDTH = 45;
+                HEIGHT = 120;
+            }
+
+            // For "very" special enemies
+            if (health == 999)
+            {
+                WIDTH = 50;
+                HEIGHT = 10;
+                xPos = 500;
+                yPos = 30;
+            }
         }
 
         public void left()
@@ -78,12 +107,27 @@ namespace someGame
                 return;
             }
 
+
+            Random rand = new Random();
+
+            if (health == 999)
+            {
+                xPos -= speed;
+
+                if (rand.Next(0, 101) < 8)
+                {
+                    newBullet = true;
+                    bullet = new Bullet(50, false, Color.Blue, true, xPos, yPos);
+                }
+
+                return;
+            }
+
             if (yPos < GROUND)
             {
                 yPos += speed / 2;
             }
 
-            Random rand = new Random();
             int movesCount = enemyMoves.Count();
 
             if (movesCount < 3)
@@ -100,6 +144,7 @@ namespace someGame
                     thirdLastMove,
                     secondLastMove,
                     lastMove,
+                    SHOOT,
                     lastMove,
                     (lastMove + secondLastMove + thirdLastMove) / 3,
                     RIGHT,
@@ -131,8 +176,14 @@ namespace someGame
                     }
                     break;
                 case SHOOT:
-                    newBullet = true;
-                    bullet = new Bullet(damage, false, Color.DarkBlue, facingRight, xPos, yPos);
+                    if (enemyMoves.Count > 3)
+                    {
+                        if (enemyMoves[movesCount - 1] != SHOOT || health > 100)
+                        {
+                            newBullet = true;
+                            bullet = new Bullet(damage, false, Color.DarkBlue, facingRight, xPos, yPos);
+                        }
+                    }
                     break;
                 default:
                     break;

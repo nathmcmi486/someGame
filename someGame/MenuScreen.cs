@@ -24,7 +24,14 @@ namespace someGame
 
         void startButtonClick(object sender, EventArgs e)
         {
-            Form1.changeScreen(this, new Game(0));
+            Game gameScreen = new Game(0, 0);
+            Form1.changeScreen(this, gameScreen);
+        }
+
+        void startLevel2(object sender, EventArgs e)
+        {
+            Game gameScreen = new Game(0, 1);
+            Form1.changeScreen(this, gameScreen);
         }
     }
 }

@@ -12,7 +12,6 @@ namespace someGame
 {
     public partial class Game : UserControl
     {
-        Random random = new Random();
         bool running = false;
         bool wDown = false;
         bool aDown = false;
@@ -20,75 +19,273 @@ namespace someGame
         bool spaceDown = false;
         bool hDown = false;
 
-        int randn(int min, int max)
-        {
-            return random.Next(min, max);
-        }
-
         int part;
+        int level;
         Part[] gameParts = {
             // Part 0
             new Part(0,
                 // Enemies
-                new Person[] {
-                    new Person(false, 80, 10, 500, 400, 10, Color.Orange),
+                new Person[]
+                {
+                    new Person(false, 80, 8, 500, 400, 10, Color.Orange),
                 }
-             ),
+            ),
+            new Part(1,
+                // Enemies
+                new Person[]
+                {
+                    new Person(false, 80, 8, 550, 400, 8, Color.Orange),
+                    new Person(false, 130, 5, 570, 400, 9, Color.DarkOrange),
+                }
+            ),
+            new Part(2,
+                new Person[]
+                {
+                    new Person(false, 80, 8, 600, 400, 8, Color.Orange),
+                    new Person(false, 350, 22, 590, 400, 3, Color.DarkOrange)
+                }
+            )
         };
-        Person player = new Person(true, 150, 25, 30, 400, 14, Color.Green);
 
-        public Game(int _partn)
+        Part[][] levels =
         {
-            Thread.Sleep(3500);
+            new Part[] {
+                // Part 0
+                new Part(0,
+                    // Enemies
+                    new Person[]
+                    {
+                        new Person(false, 80, 8, 500, 400, 10, Color.Orange),
+                    }
+                ),
+                new Part(1,
+                    // Enemies
+                    new Person[]
+                    {
+                        new Person(false, 80, 8, 550, 400, 8, Color.Orange),
+                        new Person(false, 130, 5, 570, 400, 9, Color.DarkOrange),
+                    }
+                ),
+                new Part(2,
+                    new Person[]
+                    {
+                        new Person(false, 80, 8, 600, 400, 8, Color.Orange),
+                        new Person(false, 350, 22, 590, 400, 3, Color.DarkOrange)
+                    }
+                )
+            },
+            new Part[]
+            {
+                new Part(0,
+                    new Person[]
+                    {
+                        new Person(false, 999, 50, 600, 20, 5, Color.White),
+                    }
+                )
+            }
+        };
+
+        Person player = new Person(true, 150, 12, 30, 400, 14, Color.Green);
+
+        public Game(int _partn, int _leveln)
+        {
             InitializeComponent();
+
+            Thread.Sleep(1500);
+
+            running = true;
             part = _partn;
-            gameParts[part].setupPart(player);
+            level = _leveln;
+            levels[level][part].setupPart(player);
         }
 
         void gameLoop(object sender, EventArgs e)
         {
+            if (running == false)
+            {
+                return;
+            }
+
+            if (part == 2 && levels[level][part].enemies.Count() == 0)
+            {
+                this.debugLabel.Text = "Level 1 completed!\nMove on to start next level";
+            }
+
+            int currentPart = part;
+            int currentLevel = level;
+
+            // This seems to allow key input to work, there's a lot of assumptions I have for why this happens but they
+            // might not be right
+            System.Diagnostics.Process[] procs = System.Diagnostics.Process.GetProcesses();
+            this.healthLabel.Text = $"Health: {levels[level][part].player.health}";
+            this.healLabel.Text = $"Heal (h): {levels[level][part].player.healCount}";
+            this.bulletCountLabel.Text = $"Bullets: {levels[level][part].player.bullets}";
+            this.partNumberLabel.Text = $"Level: {level + 1}\nPart: {part + 1}";
+
             if (wDown)
             {
-                gameParts[part].player.up();
+                levels[level][part].player.up();
             }
 
             if (aDown)
             {
-                gameParts[part].player.left();
+                levels[level][part].player.left();
+                if (levels[level][part].player.xPos < 10)
+                {
+                    levels[level][part].player.xPos = 10;
+                }
             }
 
             if (dDown)
             {
-                gameParts[part].player.right();
-            }
+                levels[level][part].player.right();
 
-            // this.debugLabel.Text = gameParts[part].bullets.Count() + "";
-
-            for (int i = 0; i < gameParts[part].bullets.Count(); i++)
-            {
-                gameParts[part].bullets[i].move();
-
-                if (gameParts[part].bullets[i].xPos < 0 || gameParts[part].bullets[i].xPos > 800)
+                if (levels[level][part].player.xPos > this.Width - 50)
                 {
-                    gameParts[part].bullets.RemoveAt(i);
-                    continue;
-                }
-
-                if (gameParts[part].bullets[i].yPos < 0 || gameParts[part].bullets[i].yPos > 410)
-                {
-                    gameParts[part].bullets.RemoveAt(i);
-                    continue;
+                    currentPart += 1;
                 }
             }
 
-            for (int i = 0; i < gameParts[part].enemies.Count(); i++)
+            if (hDown && levels[level][part].player.healCount > 0)
             {
-                gameParts[part].enemies[i].moveEnemy();
-                if (gameParts[part].enemies[i].newBullet)
+                levels[level][part].player.healCount -= 1;
+                levels[level][part].player.health += 40;
+                hDown = false;
+            }
+
+            if (part != currentPart)
+            {
+                Person currentPlayer = levels[level][part].player;
+                player.xPos = 30;
+                part += 1;
+
+                // Part specific stuff
+                if (level == 0)
                 {
-                    gameParts[part].bullets.Add(gameParts[part].enemies[i].bullet);
-                    gameParts[part].enemies[i].newBullet = false;
+                    switch (part)
+                    {
+                        case 1:
+                            player.bullets += 25;
+                            player.healCount += 1;
+                            break;
+                        case 2:
+                            player.bullets += 50;
+                            player.healCount += 2;
+                            break;
+                        case 3:
+                            level += 1;
+                            part = 0;
+                            break;
+                        default:
+                            break;
+                    }
                 }
+
+                levels[level][part].setupPart(currentPlayer);
+                return;
+            }
+
+            if (spaceDown)
+            {
+                Person player = levels[level][part].player;
+                if (player.bullets > 0)
+                {
+                    Bullet newBullet = new Bullet(player.damage, true, Color.Red, player.facingRight, player.xPos, player.yPos);
+                    newBullet.playerBulletXSpeed = 5;
+                    levels[level][part].bullets.Add(newBullet);
+                    spaceDown = false;
+                    levels[level][part].player.bullets -= 1;
+                }
+            }
+
+            if (levels[level][part].player.health <= 0)
+            {
+                //running = false;
+                for (int i = 0; i < levels[level][part].enemies.Count(); i++)
+                {
+                    levels[level][part].enemies[i].enemyMoves.Add(2);
+                }
+                this.debugLabel.Text = "You died! Press escape to close.";
+            }
+
+            Rectangle playerRect = new Rectangle(levels[level][part].player.xPos, levels[level][part].player.yPos, levels[level][part].player.WIDTH, levels[level][part].player.HEIGHT);
+
+            // this.debugLabel.Text = levels[level][part].bullets.Count() + "";
+
+            for (int i = 0; i < levels[level][part].bullets.Count(); i++)
+            {
+                levels[level][part].bullets[i].move();
+
+                if (levels[level][part].bullets[i].xPos < 0 || levels[level][part].bullets[i].xPos > 800)
+                {
+                    levels[level][part].bullets.RemoveAt(i);
+                    continue;
+                }
+
+                if (levels[level][part].bullets[i].yPos < 0 || levels[level][part].bullets[i].yPos > 410)
+                {
+                    levels[level][part].bullets.RemoveAt(i);
+                    continue;
+                }
+
+                Bullet currentBullet = levels[level][part].bullets[i];
+                Rectangle bulletRect = new Rectangle(currentBullet.xPos, currentBullet.yPos, currentBullet.SIZE, currentBullet.SIZE);
+
+                if (!levels[level][part].bullets[i].isPlayerBullet)
+                {
+                    if (bulletRect.IntersectsWith(playerRect))
+                    {
+                        levels[level][part].player.health -= currentBullet.damage;
+                        levels[level][part].bullets.RemoveAt(i);
+                        continue;
+                    }
+                } else
+                {
+                    for (int j = 0; j < levels[level][part].enemies.Count(); j++)
+                    {
+                        Person currentEnemy = levels[level][part].enemies[j];
+                        Rectangle enemyRect = new Rectangle(currentEnemy.xPos, currentEnemy.yPos, currentEnemy.WIDTH, currentEnemy.HEIGHT);
+
+                        if (bulletRect.IntersectsWith(enemyRect))
+                        {
+                            levels[level][part].enemies[j].health -= currentBullet.damage;
+                            levels[level][part].bullets.RemoveAt(i);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < levels[level][part].enemies.Count(); i++)
+            {
+                if (levels[level][part].enemies[i].health <= 0)
+                {
+                    List<Person> tmpEnemyList = new List<Person>(levels[level][part].enemies);
+                    tmpEnemyList.RemoveAt(i);
+                    levels[level][part].enemies = tmpEnemyList.ToArray();
+                    continue;
+                }
+
+                levels[level][part].enemies[i].moveEnemy();
+                if (levels[level][part].enemies[i].newBullet)
+                {
+                    if (levels[level][part].player.health > 0)
+                    {
+                        levels[level][part].bullets.Add(levels[level][part].enemies[i].bullet);
+                        levels[level][part].enemies[i].newBullet = false;
+                    }
+                }
+
+                if (levels[level][part].enemies[i].xPos > this.Width - 50)
+                {
+                    levels[level][part].enemies[i].xPos -= 50;
+                } else if (levels[level][part].enemies[i].xPos < 0 + 10) {
+                    if (levels[level][part].enemies[i].health == 999)
+                    {
+                        levels[level][part].enemies[i] = new Person(false, 80, 8, 600, 400, 8, Color.Orange);
+                    }
+                    levels[level][part].enemies[i].xPos += 10;
+                } 
             }
 
             Refresh();
@@ -157,23 +354,25 @@ namespace someGame
             Graphics g = e.Graphics;
 
             // Using foreach stops key input
-            for (int i = 0; i < gameParts[part].bullets.Count(); i++)
+            for (int i = 0; i < levels[level][part].bullets.Count(); i++)
             {
                 // this.debugLabel.Text = $"drawing bullet {i}";
-                Rectangle rect = new Rectangle(gameParts[part].bullets[i].xPos, gameParts[part].bullets[i].yPos, gameParts[part].bullets[i].SIZE, gameParts[part].bullets[i].SIZE);
-                g.FillRectangle(new SolidBrush(gameParts[part].bullets[i].color), rect);
+                Rectangle rect = new Rectangle(levels[level][part].bullets[i].xPos, levels[level][part].bullets[i].yPos, levels[level][part].bullets[i].SIZE, levels[level][part].bullets[i].SIZE);
+                g.FillRectangle(new SolidBrush(levels[level][part].bullets[i].color), rect);
             }
 
-            foreach (Person enemy in gameParts[part].enemies)
+            foreach (Person enemy in levels[level][part].enemies)
             {
                 Rectangle rect = new Rectangle(enemy.xPos, enemy.yPos, enemy.WIDTH, enemy.HEIGHT);
                 g.FillRectangle(enemy.brush, rect);
             }
 
-            Person currentPlayer = gameParts[part].player;
-            Rectangle playerRect = new Rectangle(currentPlayer.xPos, currentPlayer.yPos, currentPlayer.WIDTH, currentPlayer.HEIGHT);
-            g.FillRectangle(currentPlayer.brush, playerRect);
-
+            Person currentPlayer = levels[level][part].player;
+            if (currentPlayer.health > 0)
+            {
+                Rectangle playerRect = new Rectangle(currentPlayer.xPos, currentPlayer.yPos, currentPlayer.WIDTH, currentPlayer.HEIGHT);
+                g.FillRectangle(currentPlayer.brush, playerRect);
+            }
         }
     }
 }
