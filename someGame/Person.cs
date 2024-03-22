@@ -67,7 +67,7 @@ namespace someGame
             {
                 WIDTH = 50;
                 HEIGHT = 10;
-                xPos = 500;
+                xPos = 800;
                 yPos = 30;
             }
         }

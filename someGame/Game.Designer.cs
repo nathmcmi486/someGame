@@ -82,7 +82,7 @@
 
             this.Controls.Add(this.partNumberLabel);
             this.Controls.Add(this.healthLabel);
-            // this.Controls.Add(this.debugLabel);
+            //this.Controls.Add(this.debugLabel);
             this.Controls.Add(this.healLabel);
             this.Controls.Add(this.bulletCountLabel);
         }

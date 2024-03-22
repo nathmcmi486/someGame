@@ -79,10 +79,33 @@ namespace someGame
                 new Part(0,
                     new Person[]
                     {
-                        new Person(false, 999, 50, 600, 20, 5, Color.White),
+                        new Person(false, 999, 50, 820, 20, 5, Color.White),
+                    }
+                ),
+                new Part(1,
+                    new Person[]
+                    {
+                        new Person(false, 999, 50, 620, 20, 5, Color.White),
+                        new Person(false, 80, 8, 820, 400, 8, Color.Orange),
+                    }
+                ),
+                new Part(1,
+                    new Person[]
+                    {
+                        new Person(false, 999, 50, 800, 20, 5, Color.White),
+                        new Person(false, 80, 8, 820, 30, 8, Color.Orange),
+                        new Person(false, 130, 5, 700, 400, 9, Color.DarkOrange)
+                    }
+                ),
+                new Part(2,
+                    new Person[]
+                    {
+                        new Person(false, 999, 50, 800, 20, 5, Color.White),
+                        new Person(false, 999, 50, 800, 20, 3, Color.White),
+                        new Person(false, 350, 22, 820, 30, 3, Color.DarkOrange),
                     }
                 )
-            }
+            },
         };
 
         Person player = new Person(true, 150, 12, 30, 400, 14, Color.Green);
@@ -96,7 +119,21 @@ namespace someGame
             running = true;
             part = _partn;
             level = _leveln;
-            levels[level][part].setupPart(player);
+            switch (level)
+            {
+                case 0:
+                    levels[level][part].setupPart(player);
+                    break;
+                case 1:
+                    player = new Person(true, 150, 12, 30, 400, 14, Color.Green);
+                    player.healCount = 5;
+                    player.bullets = 200;
+                    levels[level][part].setupPart(player);
+
+                    break;
+                default:
+                    break;
+            }
         }
 
         void gameLoop(object sender, EventArgs e)
@@ -108,6 +145,7 @@ namespace someGame
 
             if (part == 2 && levels[level][part].enemies.Count() == 0)
             {
+                this.Controls.Add(this.debugLabel);
                 this.debugLabel.Text = "Level 1 completed!\nMove on to start next level";
             }
 
@@ -149,7 +187,7 @@ namespace someGame
             if (hDown && levels[level][part].player.healCount > 0)
             {
                 levels[level][part].player.healCount -= 1;
-                levels[level][part].player.health += 40;
+                levels[level][part].player.health += 30;
                 hDown = false;
             }
 
@@ -175,14 +213,23 @@ namespace someGame
                         case 3:
                             level += 1;
                             part = 0;
+                            player.health = 150;
+                            player.healCount = 5;
+                            player.bullets = 200;
                             break;
                         default:
                             break;
                     }
                 }
 
+                this.Controls.Remove(this.debugLabel);
                 levels[level][part].setupPart(currentPlayer);
                 return;
+            }
+
+            if (part == 2 && level == 0 && levels[0][2].enemies.Count() == 0)
+            {
+                this.debugLabel.Text = "Level 1 Complete!\nContinue right to start Level 2";
             }
 
             if (spaceDown)
@@ -200,12 +247,13 @@ namespace someGame
 
             if (levels[level][part].player.health <= 0)
             {
+                this.Controls.Remove(this.debugLabel);
+                this.debugLabel.Text = "You died! Press escape to close.";
                 //running = false;
                 for (int i = 0; i < levels[level][part].enemies.Count(); i++)
                 {
                     levels[level][part].enemies[i].enemyMoves.Add(2);
                 }
-                this.debugLabel.Text = "You died! Press escape to close.";
             }
 
             Rectangle playerRect = new Rectangle(levels[level][part].player.xPos, levels[level][part].player.yPos, levels[level][part].player.WIDTH, levels[level][part].player.HEIGHT);
@@ -282,7 +330,16 @@ namespace someGame
                 } else if (levels[level][part].enemies[i].xPos < 0 + 10) {
                     if (levels[level][part].enemies[i].health == 999)
                     {
-                        levels[level][part].enemies[i] = new Person(false, 80, 8, 600, 400, 8, Color.Orange);
+                        if (part == 0)
+                        {
+                            levels[level][part].enemies[i] = new Person(false, 80, 8, 600, 400, 8, Color.Orange);
+                        } else if (part == 1)
+                        {
+                            levels[level][part].enemies[i] = new Person(false, 999, 50, 820, 100, 5, Color.White);
+                        } else if (part == 2)
+                        {
+                            levels[level][part].enemies[i] = new Person(false, 999, 50, 820, 100, 5, Color.White);
+                        }
                     }
                     levels[level][part].enemies[i].xPos += 10;
                 } 
@@ -293,7 +350,6 @@ namespace someGame
 
         public void keyDownHandler(object sender, KeyEventArgs e)
         {
-            this.debugLabel.Text = "keydown working!";
             running = true;
             switch (e.KeyCode)
             {
@@ -322,7 +378,6 @@ namespace someGame
 
         public void keyUpHandler(object sender, KeyEventArgs e)
         {
-            this.debugLabel.Text = "keyup working!";
             running = true;
             switch (e.KeyCode)
             {
