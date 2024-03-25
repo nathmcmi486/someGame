@@ -253,6 +253,7 @@ namespace someGame
                 for (int i = 0; i < levels[level][part].enemies.Count(); i++)
                 {
                     levels[level][part].enemies[i].enemyMoves.Add(2);
+                    levels[level][part].player.health = 0;
                 }
             }
 
