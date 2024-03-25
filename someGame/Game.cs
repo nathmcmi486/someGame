@@ -149,6 +149,22 @@ namespace someGame
                 this.debugLabel.Text = "Level 1 completed!\nMove on to start next level";
             }
 
+            if (level == 1 && part == 3 && levels[level][part].enemies.Count() == 2)
+            {
+                this.Controls.Add(this.debugLabel);
+                this.debugLabel.Text = "Level 2 completed!\nYou win!";
+
+                levels[level][part].player.up();
+                Random rand = new Random();
+                if (rand.Next(0, 101) > 50)
+                {
+                    levels[level][part].player.left();
+                } else
+                {
+                    levels[level][part].player.right();
+                }
+            }
+
             int currentPart = part;
             int currentLevel = level;
 
@@ -334,10 +350,7 @@ namespace someGame
                         if (part == 0)
                         {
                             levels[level][part].enemies[i] = new Person(false, 80, 8, 600, 400, 8, Color.Orange);
-                        } else if (part == 1)
-                        {
-                            levels[level][part].enemies[i] = new Person(false, 999, 50, 820, 100, 5, Color.White);
-                        } else if (part == 2)
+                        } else if (part == 1 || part == 2)
                         {
                             levels[level][part].enemies[i] = new Person(false, 999, 50, 820, 100, 5, Color.White);
                         }
