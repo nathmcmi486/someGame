@@ -162,6 +162,10 @@ namespace someGame
                 } else
                 {
                     levels[level][part].player.right();
+                    if (levels[level][part].player.xPos > this.Width - 50)
+                    {
+                        levels[level][part].player.xPos -= 50;
+                    }
                 }
             }
 
